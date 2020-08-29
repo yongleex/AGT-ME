@@ -37,7 +37,7 @@ def gamma_trans(image, gamma):
     # Step 1. Normalised the image to (0,1), and apply gamma transformation
     img = (img + 0.5) / 256
     img = np.power(img, gamma)
-    img = np.clip(img * 256 - 0.5, 0, 255).astype(np.uint8)
+    img = np.clip(img * 256 - 0.5, 0, 255).round().astype(np.uint8)
     if color:
         hsv[:, :, 2] = img
         img = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
