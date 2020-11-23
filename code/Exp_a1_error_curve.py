@@ -93,7 +93,7 @@ def exp():
             # img = cv2.equalizeHist(img)
             img = linear_calibration(img)
             distorted_img = gamma_trans(img, gamma)  # Add gamma distortion
-            gamma_origin = 1.0oyugi
+            gamma_origin = 1.0
 
             # Test with AGT method
             gamma_estimated, _ = adaptive_gamma_transform(distorted_img, visual=False)  # distorted gamma value
