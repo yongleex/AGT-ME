@@ -1,5 +1,9 @@
-# About the test images
-Please download the images from the links below, and move them to corresponding dirs.
+# The dataset
+
+Due to the repo size limit, a small portion of the datasets is employed here and it is enough to reproduce the results in paper.
+
+The links to full datasets are provided as follows:
+
 ## 1. Natural images
 - BSD68,CBSD68,Kodak24,McMaster:[github/FFDNet](https://github.com/cszn/FFDNet/tree/master/testsets) 
 - A standard test image set: [ImageProcessingPlace.com](http://www.imageprocessingplace.com/downloads_V3/root_downloads/image_databases/standard_test_images.zip)
