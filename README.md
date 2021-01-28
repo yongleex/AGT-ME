@@ -1,5 +1,5 @@
 # AGT-ME
-This is the source code of AGT-ME, which is submitted to IEEE Transaction on Signal Processing.
+This is the source code of AGT-ME.
 
 
 ## BibTex
@@ -15,5 +15,4 @@ This is the source code of AGT-ME, which is submitted to IEEE Transaction on Sig
 ```
 ## Contact
 Yong Lee (Email: yongli.cv@gmail.com) @2020-07-07
-
 
