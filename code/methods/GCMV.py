@@ -1,28 +1,22 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 """
-This is the implementation of our method AGT-ME.
-Ref: https://arxiv.org/pdf/2007.02246.pdf
+This is the implementation of a baseline method GCMV.
+Ref: Mahamdioua, Meriama, and Mohamed Benmohammed. "New mean-variance gamma method for automatic gamma correction." International Journal of Image, Graphics and Signal Processing 9, no. 3 (2017) 
 Author: Yong Lee
 E-Mail: yongli.cv@gmail.com
-C-Data: 2019.04.10
-______________________________
-version 2
-M-Data: 2020.09.03
-    1. Correct the bugs of AGT-ME
-    2. Add CAB algorithm
+C-Data: 2021.4.8
 """
 import cv2
 import time
 import numpy as np
+import scipy.optimize as op
 
 
-def adaptive_gamma_transform(image, mask=None, normalize=False, visual=True):
+def GCMV(image, mask=None):
     """
     :param image:  input image, color (3 channels) or gray (1 channel);
     :param mask:  calc gamma value in the mask area, default is the whole image;
-    :param normalize: normalize the input with max/min or not
-    :param visual: for better visualization, we divide the  maximized entropy gamma with a constant 2.2
     :return: gamma, and output
     """
 
@@ -37,44 +31,44 @@ def adaptive_gamma_transform(image, mask=None, normalize=False, visual=True):
     else:
         print("ERROR：check the input image of AGT function...")
         return 1, None
-    if not (visual or not visual):
-        print("ERROR：check the visual of AGT function...")
-        return 1, None
 
-    # Step 2. pre-processing
-    if normalize:  # normalization
-        img = img.astype(np.float)
-        img = (255 * (img - np.min(img[:])) / (np.max(img[:]) - np.min(img[:]) + 0.1)).astype(np.float)
-
-    # Step 3. Main steps of AGT-ME
-    # Step 3.1 image normalization to range (0,1)
-    img = (img + 0.5) / 256
-
-    # Step 3.2 calculate the gamma
-    img_log = np.log(img)
     if mask is not None:
-        mask[mask < 255] = 0
-        img_log[mask == 0] = np.NaN
-    gamma = -1 / np.nanmean(img_log[:])
-
-    # Step 3.3  weather optimize for human visual system
-    if visual:
-        gamma = gamma / 2.2
-
-    # Step 3.4 apply gamma transformation
-    output = np.power(img, gamma)
-
-    # Step 4.0 stretch back and post-process
-    if mask is not None:
-        output = (output * 256 - 0.5) * mask / 255.0
+        mask = mask<255
     else:
-        output = (output * 256 - 0.5)
+        mask = np.ones_like(img)
+        
+    # Step 2. Main steps of GCMV
+    n_img = img/255.0
+    mean = np.mean(n_img) 
+    gamma_list = np.arange(0.01,1.01,0.01) if mean<=0.5 else np.arange(1.1,10.1,0.1)
+    
+    score = np.zeros_like(gamma_list)
+    for k, gamma in enumerate(gamma_list):
+        t_img = np.power(n_img, gamma)
+        m1, v1 = np.mean(t_img, axis=0), np.var(t_img, axis=0)
+        m2, v2 = np.mean(t_img, axis=1), np.var(t_img, axis=1)
+        score[k] = np.mean(np.power(m1-0.5077,2)) + np.mean(np.power(m2-0.5077,2))+np.mean(np.power(v1-0.0268,2)) + np.mean(np.power(v2-0.0268,2))
+
+    # grid search for the optimal gamma
+    ind = np.argmin(score)
+    best_gamma =gamma_list[ind]
+    # print(best_gamma)
+    
+    # Step 2.4 apply gamma transformation
+    n_img = (img+0.5)/256
+    output = np.power(n_img, best_gamma)
+
+    # Step 3.0 stretch back and post-process
+    # if mask is not None:
+    #     output = (output * 256 - 0.5) * mask / 255.0
+    # else:
+    output = (output * 256 - 0.5)
     output = output.round().astype(np.uint8)
     if color_flag:
         hsv[:, :, 2] = output
         output = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
 
-    return gamma, output
+    return best_gamma, output
 
 
 # test function
@@ -83,7 +77,7 @@ def simple_example():
     visual = False
 
     start_time = time.time()
-    gamma, output = adaptive_gamma_transform(image, visual=visual)
+    gamma, output = GCMV(image)
     end_time = time.time()
 
     print("Estimated gamma =" + str(gamma) + ", with time cost=" + str(end_time - start_time) + "s")
@@ -95,10 +89,10 @@ def simple_example():
     import matplotlib.pyplot as plt
     plt.figure()
     plt.imshow(image[:, :, ::-1])
-    plt.title("Before: AGT-ME")
+    plt.title("Before: GCMV")
     plt.figure()
     plt.imshow(output[:, :, ::-1])
-    plt.title("After: AGT-ME")
+    plt.title("After: GCMV")
     plt.show()
 
 

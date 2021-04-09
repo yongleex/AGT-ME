@@ -77,9 +77,9 @@ def get_bi_coherence_cost(image, scanline_flag=False):
     return cost
 
 
-def blind_inverse_gamma_correction(image, method="fast", visual=False):
+def BIGC(image, method="fast"):
     """
-    This is our main implementation of work Farid, 《Blind Inverse Gamma Correction》.
+    This is our main implementation of work Farid, "Blind Inverse Gamma Correction".
     :param image:  input image, color (3 channels) or gray (1 channel);
     :param method:  "fast" and "bruteforce" available
     :return: gamma, and result
@@ -131,8 +131,6 @@ def blind_inverse_gamma_correction(image, method="fast", visual=False):
         print(gamma)
 
     # Step 3.0 apply gamma transformation
-    if visual:
-        gamma = gamma / 2.2
     result = gamma_trans(img, gamma)
     if color:
         hsv[:, :, 2] = result
@@ -145,16 +143,24 @@ def simple_example():
     image = cv2.imread(r"../../images/natural_image_sets/CBSD68/14037.png")
 
     start_time = time.time()
-    # gamma, result = blind_inverse_gamma_correction(image, "bruteforce", visual=True)
-    gamma, result = blind_inverse_gamma_correction(image, "fast", visual=True)
+    gamma, output = BIGC(image, "fast")
     end_time = time.time()
 
     print("Estimated gamma =" + str(gamma) + ", with time cost=" + str(end_time - start_time) + "s")
-    cv2.namedWindow("input", cv2.WINDOW_NORMAL)
-    cv2.namedWindow("output", cv2.WINDOW_NORMAL)
-    cv2.imshow("input", image)
-    cv2.imshow("output", result)
-    cv2.waitKey()
+    # cv2.namedWindow("input", cv2.WINDOW_NORMAL)
+    # cv2.namedWindow("output", cv2.WINDOW_NORMAL)
+    # cv2.imshow("input", image)
+    # cv2.imshow("output", result)
+    # cv2.waitKey()
+
+    import matplotlib.pyplot as plt
+    plt.figure()
+    plt.imshow(image[:, :, ::-1])
+    plt.title("Before:BIGC")
+    plt.figure()
+    plt.imshow(output[:, :, ::-1])
+    plt.title("After:BIGC")
+    plt.show()
 
 
 if __name__ == '__main__':
