@@ -1,5 +1,5 @@
 # AGT-ME
-[![preprint](https://img.shields.io/static/v1?label=Journal&message=Signal Processing&color=B31B1B)](https://doi.org/10.1016/j.sigpro.2021.108427)
+[![preprint](https://img.shields.io/static/v1?label=Journal&message=Signal_Processing&color=B31B1B)](https://doi.org/10.1016/j.sigpro.2021.108427)
 [![preprint](https://img.shields.io/static/v1?label=arXiv&message=2007.02246&color=B31B1B)](http://arxiv.org/abs/2007.02246)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
